@@ -48,7 +48,7 @@ jobs:
       - name: Prepare dashboard
         run: |
           mkdir -p public
-          cp index.html dashboard.css dashboard.js dashboard-data.json public/
+          cp index.html dashboard.css dashboard.js yard3d.js dashboard-data.json public/
           touch public/.nojekyll
 
       - name: Configure GitHub Pages
