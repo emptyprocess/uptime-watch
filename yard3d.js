@@ -9,8 +9,8 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color("#0b1520");
 scene.fog = new THREE.Fog("#0b1520", 48, 105);
 
-const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 180);
-camera.position.set(32, 31, 42);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 250);
+camera.position.set(45, 42, 65);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -29,7 +29,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.07;
 controls.minDistance = 22;
-controls.maxDistance = 85;
+controls.maxDistance = 120;
 controls.maxPolarAngle = Math.PI / 2.12;
 controls.target.set(0, 0, 0);
 
@@ -343,10 +343,37 @@ async function loadData() {
   });
 }
 
+const containerGroups = [];
+
+function clearYard() {
+  for (const group of containerGroups) {
+    scene.remove(group);
+
+    group.traverse((object) => {
+      object.geometry?.dispose();
+
+      if (object.material) {
+        const materials = Array.isArray(object.material)
+          ? object.material
+          : [object.material];
+
+        for (const material of materials) {
+          material.map?.dispose();
+          material.dispose();
+        }
+      }
+    });
+  }
+
+  containerGroups.length = 0;
+  hitboxes.length = 0;
+}
+
 async function populateYard() {
   const entries = await loadData();
 
-  // 10 columns × 5 rows for 50 services
+  clearYard();
+
   entries.forEach(({ service, status }, index) => {
     const col = index % 10;
     const row = Math.floor(index / 10);
@@ -360,6 +387,8 @@ async function populateYard() {
       new THREE.Vector3(x, 0.1, z)
     );
 
+    containerGroups.push(container);
+
     const hitbox = container.children.find(
       (child) => child.userData.containerGroup
     );
@@ -368,11 +397,17 @@ async function populateYard() {
   });
 }
 
-populateYard().catch((error) => {
-  console.error("Unable to load 3D yard:", error);
-  tooltip.hidden = false;
-  tooltip.textContent = "3D service data unavailable";
-});
+function refreshYard() {
+  populateYard().catch((error) => {
+    console.error("Unable to load 3D yard:", error);
+    tooltip.hidden = false;
+    tooltip.textContent = "3D service data unavailable";
+  });
+}
+
+refreshYard();
+
+window.addEventListener("uptime:data-updated", refreshYard);
 
 // Resize and rendering
 const resizeObserver = new ResizeObserver(() => {
@@ -411,7 +446,7 @@ function animate() {
     if (truck.position.x > 22) truck.position.x = -22;
 
     for (const wheel of wheels) {
-      wheel.rotation.z -= delta * 2.6;
+      wheel.rotation.y -= delta * 2.6;
     }
   }
 
