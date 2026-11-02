@@ -1,425 +1,588 @@
 
 const DATA_URL = "./dashboard-data.json";
+const STALE_MINUTES = 45;
+const HISTORY_SLOTS = 32;
 
-let dataset = null;
-let periodDays = 7;
-let searchQuery = "";
+const state = {
+  data: null,
+  filter: "all",
+  search: "",
+  expandedCategories: new Set(),
+  expandedService: null,
+};
 
 const $ = (id) => document.getElementById(id);
 
-const tooltip = $("tooltip");
+const escapeHTML = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[c]);
 
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+const formatTime = (value) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Unknown"
+    : date.toLocaleString();
+};
+
+const formatLatency = (value) =>
+  Number.isFinite(Number(value))
+    ? `${Math.round(Number(value))} ms`
+    : "—";
+
+const serviceLogo = (service) => {
+  const domain = new URL(service.url).hostname;
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
+};
+
+function allChecks() {
+  return Array.isArray(state.data?.checks)
+    ? state.data.checks
+    : [];
 }
 
-function formatTime(value) {
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
-
-function getChecks() {
-  const cutoff = Date.now() - periodDays * 86400000;
-
-  return dataset.checks.filter(
-    (check) => new Date(check.timestamp).getTime() >= cutoff
-  );
-}
-
-function getResult(check, id) {
-  return check.results.find((result) => result.id === id);
-}
-
-function getServiceHistory(id, checks) {
-  return checks
+function serviceChecks(id) {
+  return allChecks()
     .map((check) => ({
       timestamp: check.timestamp,
-      result: getResult(check, id),
+      result: check.results?.find((r) => r.id === id),
     }))
     .filter((item) => item.result);
 }
 
-function uptimePercent(history) {
-  const conclusive = history.filter(
-    (item) => ["up", "down"].includes(item.result.status)
-  );
-
-  if (!conclusive.length) return null;
-
-  const successful = conclusive.filter(
-    (item) => item.result.status === "up"
-  ).length;
-
-  return (successful / conclusive.length) * 100;
+function latestResult(id) {
+  const checks = serviceChecks(id);
+  return checks.length ? checks[checks.length - 1] : null;
 }
 
-function averageLatency(history) {
-  const valid = history.filter(
-    (item) => item.result.status === "up"
-  );
+function statusFor(service) {
+  const latest = latestResult(service.id);
 
-  if (!valid.length) return null;
+  if (!latest) return "stale";
 
-  return Math.round(
-    valid.reduce(
-      (sum, item) => sum + item.result.latency_ms,
-      0
-    ) / valid.length
-  );
+  const age = Date.now() - new Date(latest.timestamp).getTime();
+
+  if (!Number.isFinite(age) || age > STALE_MINUTES * 60000) {
+    return "stale";
+  }
+
+  const status = latest.result.status;
+  return ["up", "down", "unknown"].includes(status)
+    ? status
+    : "unknown";
 }
 
-function createHistoryBars(id, history) {
-  const slots = 48;
-  const duration = periodDays * 86400000;
-  const end = Date.now();
-  const start = end - duration;
-  const slotMs = duration / slots;
+function statusLabel(status) {
+  return {
+    up: "Operational",
+    down: "Unreachable",
+    unknown: "Inconclusive",
+    stale: "No recent data",
+  }[status] || "Unknown";
+}
 
-  const container = document.createElement("div");
-  container.className = "history";
+function services() {
+  return Array.isArray(state.data?.services)
+    ? state.data.services
+    : [];
+}
 
-  for (let i = 0; i < slots; i++) {
-    const from = start + i * slotMs;
-    const to = from + slotMs;
+function summary() {
+  const counts = { up: 0, down: 0, unknown: 0, stale: 0 };
 
-    const items = history.filter((item) => {
-      const timestamp = new Date(item.timestamp).getTime();
-      return timestamp >= from && timestamp < to;
+  for (const service of services()) {
+    counts[statusFor(service)]++;
+  }
+
+  return counts;
+}
+
+function renderSummary() {
+  const counts = summary();
+  const total = services().length;
+
+  $("totalCount").textContent = total;
+  $("upCount").textContent = counts.up;
+  $("unknownCount").textContent = counts.unknown;
+  $("downCount").textContent = counts.down;
+
+  const latencies = services()
+    .filter((s) => statusFor(s) !== "stale")
+    .map((s) => latestResult(s.id)?.result.latency_ms)
+    .filter((n) => Number.isFinite(Number(n)))
+    .map(Number);
+
+  $("avgLatency").textContent = latencies.length
+    ? formatLatency(
+        latencies.reduce((a, b) => a + b, 0) / latencies.length
+      )
+    : "—";
+
+  const badge = $("healthBadge");
+
+  badge.textContent = counts.down
+    ? `${counts.down} unreachable`
+    : counts.stale
+      ? `${counts.stale} without recent data`
+      : counts.unknown
+        ? `${counts.unknown} inconclusive`
+        : "All monitored endpoints reachable";
+
+  badge.style.color = counts.down
+    ? "var(--red)"
+    : counts.stale || counts.unknown
+      ? "var(--amber)"
+      : "var(--green)";
+
+  const newest = allChecks().at(-1);
+
+  $("lastChecked").textContent = newest
+    ? `Latest check: ${formatTime(newest.timestamp)}`
+    : "No monitoring data yet";
+
+  const coverage = total
+    ? ((total - counts.stale) / total) * 100
+    : 0;
+
+  $("coverageText").textContent =
+    `${coverage.toFixed(1)}% have recent checks`;
+
+  $("coverageFill").style.width = `${coverage}%`;
+}
+
+function renderYard() {
+  const sorted = [...services()].sort(
+    (a, b) => priority(statusFor(a)) - priority(statusFor(b))
+  );
+
+  const yard = $("containerYard");
+  yard.replaceChildren();
+
+  for (const service of sorted) {
+    const button = document.createElement("button");
+    const status = statusFor(service);
+
+    button.className = `yard-container ${status}`;
+    button.type = "button";
+    button.title = `${service.name}: ${statusLabel(status)}`;
+    button.setAttribute(
+      "aria-label",
+      `${service.name}: ${statusLabel(status)}`
+    );
+
+    button.addEventListener("click", () => {
+      state.filter = "all";
+      state.search = "";
+      $("searchInput").value = "";
+      state.expandedCategories.add(service.category);
+      state.expandedService = service.id;
+
+      syncFilterButtons();
+      renderServices();
+
+      document.getElementById(`service-${CSS.escape(service.id)}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
 
-    let status = "missing";
+    yard.append(button);
+  }
+}
 
-    if (items.some((item) => item.result.status === "down")) {
-      status = "down";
-    } else if (items.some((item) => item.result.status === "unknown")) {
-      status = "unknown";
-    } else if (items.length) {
-      status = "up";
-    }
+function priority(status) {
+  return { down: 0, unknown: 1, stale: 2, up: 3 }[status] ?? 4;
+}
 
-    const bar = document.createElement("button");
-    bar.type = "button";
-    bar.className = `history-bar ${status}`;
+function historyBars(id) {
+  const now = Date.now();
+  const duration = 24 * 60 * 60 * 1000;
+  const slotDuration = duration / HISTORY_SLOTS;
+  const checks = serviceChecks(id);
 
-    const avg = averageLatency(items);
-    const failures = items.filter(
-      (item) => item.result.status === "down"
-    ).length;
+  let html = "";
 
-    const details = [
-      `${formatTime(from)} – ${formatTime(to)}`,
-      `Status: ${status.toUpperCase()}`,
-      `Checks: ${items.length}`,
-      `Failures: ${failures}`,
-      `Average latency: ${avg === null ? "N/A" : avg + " ms"}`,
-    ];
+  for (let i = 0; i < HISTORY_SLOTS; i++) {
+    const start = now - duration + i * slotDuration;
+    const end = start + slotDuration;
 
-    if (items.length) {
-      const latest = items[items.length - 1].result;
-      details.push(`Latest HTTP: ${latest.http_status ?? "N/A"}`);
+    const matching = checks.filter((c) => {
+      const t = new Date(c.timestamp).getTime();
+      return t >= start && t < end;
+    });
 
-      if (latest.error) {
-        details.push(`Error: ${latest.error}`);
+    let status = "";
+
+    if (matching.length) {
+      if (matching.some((c) => c.result.status === "down")) {
+        status = "down";
+      } else if (matching.some((c) => c.result.status === "unknown")) {
+        status = "unknown";
+      } else {
+        status = "up";
       }
     }
 
-    const content = details.join("\n");
+    const title = matching.length
+      ? `${matching.length} checks: ${statusLabel(status)}`
+      : "No checks recorded";
 
-    bar.setAttribute("aria-label", content);
-    bar.title = content;
-
-    bar.addEventListener("mouseenter", (event) => {
-      showTooltip(content, event);
-    });
-
-    bar.addEventListener("mousemove", moveTooltip);
-    bar.addEventListener("mouseleave", hideTooltip);
-
-    bar.addEventListener("focus", (event) => {
-      showTooltip(content, event);
-    });
-
-    bar.addEventListener("blur", hideTooltip);
-
-    bar.addEventListener("click", (event) => {
-      showTooltip(content, event);
-    });
-
-    container.appendChild(bar);
+    html += `<span class="history-cell ${status}"
+      title="${escapeHTML(title)}"></span>`;
   }
 
-  return container;
+  return `<div class="mini-history" aria-label="Last 24 hours">${html}</div>`;
 }
 
-function showTooltip(content, event) {
-  tooltip.textContent = content;
-  tooltip.hidden = false;
-  moveTooltip(event);
+function uptimeFor(id, days = 30) {
+  const cutoff = Date.now() - days * 86400000;
+
+  const results = serviceChecks(id)
+    .filter((c) => new Date(c.timestamp).getTime() >= cutoff)
+    .map((c) => c.result.status);
+
+  const up = results.filter((s) => s === "up").length;
+  const down = results.filter((s) => s === "down").length;
+  const counted = up + down;
+
+  return counted ? `${(up / counted * 100).toFixed(2)}%` : "—";
 }
 
-function moveTooltip(event) {
-  const rect = event.currentTarget.getBoundingClientRect();
-
-  const width = tooltip.offsetWidth;
-  const height = tooltip.offsetHeight;
-
-  const left = Math.min(
-    window.innerWidth - width - 12,
-    Math.max(12, rect.left + rect.width / 2 - width / 2)
+function chartSVG(points, label = "Response time") {
+  const valid = points.filter(
+    (p) => Number.isFinite(Number(p.value))
   );
 
-  const top = Math.max(
-    12,
-    rect.top - height - 10
-  );
+  if (valid.length < 2) {
+    return `<div class="empty">Not enough historical data for a chart.</div>`;
+  }
 
-  tooltip.style.left = `${left}px`;
-  tooltip.style.top = `${top}px`;
+  const width = 600;
+  const height = 185;
+  const pad = 16;
+  const max = Math.max(100, ...valid.map((p) => Number(p.value))) * 1.15;
+
+  const coordinates = valid.map((p, i) => {
+    const x = pad + i / (valid.length - 1) * (width - 2 * pad);
+    const y = height - pad - Number(p.value) / max * (height - 2 * pad);
+    return [x, y];
+  });
+
+  const line = coordinates
+    .map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`)
+    .join(" ");
+
+  const fill = `${line} L${coordinates.at(-1)[0]},${height - pad}
+    L${coordinates[0][0]},${height - pad} Z`;
+
+  const grid = [0.25, 0.5, 0.75].map((f) => {
+    const y = height * f;
+    return `<line x1="0" y1="${y}" x2="${width}" y2="${y}"
+      stroke="#294052" stroke-dasharray="4 6" />`;
+  }).join("");
+
+  return `<svg viewBox="0 0 ${width} ${height}"
+    role="img" aria-label="${escapeHTML(label)}">
+    <defs>
+      <linearGradient id="latencyFill" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#18dc83" stop-opacity=".26"/>
+        <stop offset="100%" stop-color="#18dc83" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${grid}
+    <path d="${fill}" fill="url(#latencyFill)"/>
+    <path d="${line}" fill="none" stroke="#18dc83"
+      stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`;
 }
 
-function hideTooltip() {
-  tooltip.hidden = true;
+function renderOverviewChart() {
+  const cutoff = Date.now() - 86400000;
+
+  const points = allChecks()
+    .filter((c) => new Date(c.timestamp).getTime() >= cutoff)
+    .map((check) => {
+      const values = (check.results || [])
+        .filter((r) => r.status === "up")
+        .map((r) => Number(r.latency_ms))
+        .filter(Number.isFinite);
+
+      return {
+        value: values.length
+          ? values.reduce((a, b) => a + b, 0) / values.length
+          : null,
+      };
+    })
+    .filter((p) => p.value !== null);
+
+  $("overviewChart").innerHTML =
+    chartSVG(points, "Average response time over 24 hours");
 }
 
-function renderSummary(checks) {
-  const latest = dataset.checks.at(-1);
+function serviceDetails(service) {
+  const checks = serviceChecks(service.id);
+  const latest = latestResult(service.id);
+  const cutoff = Date.now() - 86400000;
 
-  $("total").textContent = dataset.services.length;
+  const points = checks
+    .filter((c) => new Date(c.timestamp).getTime() >= cutoff)
+    .map((c) => ({ value: c.result.latency_ms }));
 
-  if (!latest) {
-    $("operational").textContent = "—";
-    $("unreachable").textContent = "—";
-    $("avg-latency").textContent = "—";
-    $("last-check").textContent = "No monitoring reports yet.";
+  const http = latest?.result.http_status ?? "—";
+  const latency = latest
+    ? formatLatency(latest.result.latency_ms)
+    : "—";
+
+  return `<div class="service-details">
+    <div class="detail-stats">
+      <div><span>Uptime (30d, observed)</span><strong>${uptimeFor(service.id)}</strong></div>
+      <div><span>Latest latency</span><strong>${latency}</strong></div>
+      <div><span>HTTP status</span><strong>${escapeHTML(http)}</strong></div>
+      <div><span>Last check</span><strong>${latest ? escapeHTML(formatTime(latest.timestamp)) : "—"}</strong></div>
+    </div>
+    <h3>Latency · last 24 hours</h3>
+    <div class="chart-area">${chartSVG(points, `${service.name} latency`)}</div>
+    <div class="detail-actions">
+      <a href="${escapeHTML(service.url)}" target="_blank"
+         rel="noopener noreferrer">Visit endpoint ↗</a>
+    </div>
+  </div>`;
+}
+
+function renderServices() {
+  const groups = new Map();
+
+  for (const service of services()) {
+    const status = statusFor(service);
+
+    if (state.filter !== "all" && state.filter !== status) continue;
+
+    if (!`${service.name} ${service.category}`.toLowerCase()
+      .includes(state.search.toLowerCase())) continue;
+
+    if (!groups.has(service.category)) groups.set(service.category, []);
+    groups.get(service.category).push(service);
+  }
+
+  const root = $("serviceGroups");
+  root.replaceChildren();
+
+  if (!groups.size) {
+    root.innerHTML = `<div class="panel empty">No matching services.</div>`;
     return;
   }
 
-  const results = latest.results;
-  const up = results.filter((r) => r.status === "up").length;
-  const down = results.filter((r) => r.status === "down").length;
-
-  const valid = results.filter((r) => r.status === "up");
-  const avg = valid.length
-    ? Math.round(
-        valid.reduce((sum, r) => sum + r.latency_ms, 0) /
-        valid.length
-      )
-    : null;
-
-  $("operational").textContent = up;
-  $("unreachable").textContent = down;
-  $("avg-latency").textContent = avg === null ? "—" : `${avg} ms`;
-
-  $("last-check").textContent =
-    `Last check: ${formatTime(latest.timestamp)}`;
-
-  const badge = $("overall-status");
-  const age = Date.now() - new Date(latest.timestamp).getTime();
-
-  badge.className = "status-badge";
-
-  if (age > 45 * 60000) {
-    badge.textContent = "Monitoring delayed";
-  } else if (down > 0) {
-    badge.textContent = `${down} endpoint issue${down === 1 ? "" : "s"}`;
-    badge.classList.add("problem");
-  } else {
-    badge.textContent = "No probe failures";
-    badge.classList.add("healthy");
-  }
-}
-
-function renderServices(checks) {
-  const root = $("services");
-  root.replaceChildren();
-
-  const categories = [...new Set(
-    dataset.services.map((service) => service.category)
-  )];
-
-  for (const category of categories) {
-    const services = dataset.services.filter(
-      (service) =>
-        service.category === category &&
-        service.name.toLowerCase().includes(searchQuery)
+  for (const [category, items] of groups) {
+    items.sort((a, b) =>
+      priority(statusFor(a)) - priority(statusFor(b)) ||
+      a.name.localeCompare(b.name)
     );
 
-    if (!services.length) continue;
+    const expanded = state.search ||
+      state.filter !== "all" ||
+      state.expandedCategories.has(category);
 
     const section = document.createElement("section");
-    section.className = "category";
+    section.className = `category ${expanded ? "" : "collapsed"}`;
 
-    const heading = document.createElement("div");
-    heading.className = "category-title";
-    heading.innerHTML = `
-      <h2>${escapeHTML(category)}</h2>
-      <span>${services.length} services</span>
-    `;
-    section.appendChild(heading);
+    const header = document.createElement("button");
+    header.type = "button";
+    header.className = "category-header";
+    header.innerHTML = `<span>
+      <span class="category-title">${escapeHTML(category)}</span>
+      <span class="category-count">${items.length} services</span>
+    </span><span>${expanded ? "⌃" : "⌄"}</span>`;
 
-    for (const service of services) {
-      const history = getServiceHistory(service.id, checks);
-      const latest = dataset.checks.at(-1);
-      const current = latest && getResult(latest, service.id);
-      const uptime = uptimePercent(history);
-      const latency = averageLatency(history);
+    header.addEventListener("click", () => {
+      if (state.expandedCategories.has(category)) {
+        state.expandedCategories.delete(category);
+      } else {
+        state.expandedCategories.add(category);
+      }
+      renderServices();
+    });
+
+    const body = document.createElement("div");
+    body.className = "category-body";
+
+    for (const service of items) {
+      const status = statusFor(service);
+      const latest = latestResult(service.id);
+      const expandedService = state.expandedService === service.id;
 
       const row = document.createElement("div");
-      row.className = "service";
+      row.className = "service-row";
+      row.id = `service-${service.id}`;
 
-      const top = document.createElement("div");
-      top.className = "service-top";
+      const summary = document.createElement("button");
+      summary.type = "button";
+      summary.className = "service-summary";
+      summary.setAttribute("aria-expanded", String(expandedService));
 
-      const status = current?.status ?? "missing";
+      const identity = document.createElement("span");
+      identity.className = "service-identity";
 
-      top.innerHTML = `
-        <div>
-          <div class="service-name">
-            <a href="${escapeHTML(service.url)}"
-               target="_blank"
-               rel="noopener noreferrer">
-              ${escapeHTML(service.name)}
-            </a>
-          </div>
-          <div class="service-meta">
-            ${latency === null ? "No latency data" : latency + " ms average"}
-          </div>
-        </div>
-        <div class="service-status">
-          <i class="dot ${status}"></i>
-          ${escapeHTML(status.toUpperCase())}
-        </div>
-      `;
+      const img = document.createElement("img");
+      img.className = "service-logo";
+      img.src = serviceLogo(service);
+      img.alt = "";
+      img.loading = "lazy";
+      img.onerror = () => {
+        const fallback = document.createElement("span");
+        fallback.className = "service-logo service-fallback";
+        fallback.textContent = service.name[0]?.toUpperCase() || "?";
+        img.replaceWith(fallback);
+      };
 
-      row.appendChild(top);
-      row.appendChild(createHistoryBars(service.id, history));
+      const name = document.createElement("span");
+      name.className = "service-name";
+      name.textContent = service.name;
 
-      const bottom = document.createElement("div");
-      bottom.className = "service-bottom";
+      identity.append(img, name);
 
-      bottom.innerHTML = `
-        <span>${periodDays === 1 ? "24h" : periodDays + "d"} ago</span>
-        <span>
-          ${uptime === null ? "No data" : uptime.toFixed(2) + "% uptime"}
-        </span>
-        <span>Now</span>
-      `;
+      const pill = document.createElement("span");
+      pill.className = `status-pill ${status}`;
+      pill.textContent = statusLabel(status);
 
-      row.appendChild(bottom);
-      section.appendChild(row);
+      const latency = document.createElement("span");
+      latency.className = "muted";
+      latency.textContent = latest
+        ? formatLatency(latest.result.latency_ms)
+        : "—";
+
+      const bars = document.createElement("span");
+      bars.innerHTML = historyBars(service.id);
+
+      const arrow = document.createElement("span");
+      arrow.textContent = expandedService ? "⌃" : "›";
+
+      summary.append(identity, pill, latency, bars, arrow);
+
+      summary.addEventListener("click", () => {
+        state.expandedService = expandedService ? null : service.id;
+        renderServices();
+      });
+
+      row.append(summary);
+
+      if (expandedService) {
+        const details = document.createElement("div");
+        details.innerHTML = serviceDetails(service);
+        row.append(details.firstElementChild);
+      }
+
+      body.append(row);
     }
 
-    root.appendChild(section);
+    section.append(header, body);
+    root.append(section);
   }
 }
 
-function renderIncidents(checks) {
+function renderIncidents() {
   const incidents = [];
 
-  for (const check of checks) {
-    for (const result of check.results) {
+  for (const check of allChecks()) {
+    for (const result of check.results || []) {
       if (result.status === "down") {
         incidents.push({
           timestamp: check.timestamp,
-          ...result,
+          name: result.name || result.id,
+          error: result.error || `HTTP ${result.http_status ?? "unknown"}`,
         });
       }
     }
   }
 
-  incidents.sort(
-    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  incidents.sort((a, b) =>
+    new Date(b.timestamp) - new Date(a.timestamp)
   );
 
-  const root = $("incidents");
-  root.replaceChildren();
-
-  if (!incidents.length) {
-    const empty = document.createElement("div");
-    empty.className = "incident";
-    empty.textContent = "No probe failures recorded in this period.";
-    root.appendChild(empty);
-    return;
-  }
-
-  for (const incident of incidents.slice(0, 20)) {
-    const item = document.createElement("div");
-    item.className = "incident";
-
-    item.innerHTML = `
-      <strong>${escapeHTML(incident.name)}</strong>
-      <p>
-        ${escapeHTML(formatTime(incident.timestamp))}
-        · HTTP ${escapeHTML(incident.http_status ?? "N/A")}
-        · ${escapeHTML(incident.error || "Request failed")}
-      </p>
-    `;
-
-    root.appendChild(item);
-  }
+  $("incidentList").innerHTML = incidents.length
+    ? incidents.slice(0, 15).map((item) => `
+      <div class="incident-item">
+        <div><strong>${escapeHTML(item.name)}</strong>
+          <div class="muted">${escapeHTML(item.error)}</div>
+        </div>
+        <span class="muted">${escapeHTML(formatTime(item.timestamp))}</span>
+      </div>
+    `).join("")
+    : `<div class="empty">No failed checks recorded in the available history.</div>`;
 }
 
-function render() {
-  if (!dataset) return;
-
-  const checks = getChecks();
-  renderSummary(checks);
-  renderServices(checks);
-  renderIncidents(checks);
+function syncFilterButtons() {
+  document.querySelectorAll("[data-filter]").forEach((button) => {
+    button.classList.toggle(
+      "active", button.dataset.filter === state.filter
+    );
+  });
 }
 
-async function loadData() {
+async function loadDashboard() {
+  $("refreshBtn").disabled = true;
+
   try {
     const response = await fetch(
       `${DATA_URL}?t=${Date.now()}`,
       { cache: "no-store" }
     );
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    state.data = await response.json();
+
+    if (!state.expandedCategories.size && !state.initialized) {
+      const first = services()[0]?.category;
+      if (first) state.expandedCategories.add(first);
+      state.initialized = true;
     }
 
-    dataset = await response.json();
-    render();
+    renderSummary();
+    renderYard();
+    renderOverviewChart();
+    renderServices();
+    renderIncidents();
+
   } catch (error) {
-    $("last-check").textContent =
-      `Unable to load monitoring data: ${error.message}`;
-    $("overall-status").textContent = "Data unavailable";
+    $("healthBadge").textContent = "Data unavailable";
+    $("serviceGroups").innerHTML =
+      `<div class="panel empty">Unable to load dashboard data.</div>`;
+    console.error(error);
+
+  } finally {
+    $("refreshBtn").disabled = false;
   }
 }
 
-document.querySelectorAll("[data-period]").forEach((button) => {
+document.querySelectorAll("[data-filter]").forEach((button) => {
   button.addEventListener("click", () => {
-    periodDays = Number(button.dataset.period);
-
-    document.querySelectorAll("[data-period]").forEach(
-      (item) => item.classList.remove("active")
-    );
-
-    button.classList.add("active");
-    hideTooltip();
-    render();
+    state.filter = button.dataset.filter;
+    syncFilterButtons();
+    renderServices();
   });
 });
 
-$("search").addEventListener("input", (event) => {
-  searchQuery = event.target.value.toLowerCase().trim();
-  render();
+$("searchInput").addEventListener("input", (event) => {
+  state.search = event.target.value;
+  renderServices();
 });
 
-$("refresh").addEventListener("click", loadData);
-
-document.addEventListener("click", (event) => {
-  if (!event.target.closest(".history-bar")) {
-    hideTooltip();
-  }
+$("expandAll").addEventListener("click", () => {
+  services().forEach((s) => state.expandedCategories.add(s.category));
+  renderServices();
 });
 
-loadData();
+$("collapseAll").addEventListener("click", () => {
+  state.expandedCategories.clear();
+  state.search = "";
+  state.filter = "all";
+  $("searchInput").value = "";
+  syncFilterButtons();
+  renderServices();
+});
+
+$("refreshBtn").addEventListener("click", loadDashboard);
+
+loadDashboard();
