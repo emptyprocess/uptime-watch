@@ -586,3 +586,22 @@ $("collapseAll").addEventListener("click", () => {
 $("refreshBtn").addEventListener("click", loadDashboard);
 
 loadDashboard();
+
+window.addEventListener("uptime:select-service", (event) => {
+  const id = event.detail?.id;
+  const service = services().find((item) => item.id === id);
+
+  if (!service) return;
+
+  state.filter = "all";
+  state.search = "";
+  state.expandedCategories.add(service.category);
+  state.expandedService = service.id;
+
+  $("searchInput").value = "";
+  syncFilterButtons();
+  renderServices();
+
+  document.getElementById(`service-${CSS.escape(id)}`)
+    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+});

@@ -1,14 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#080d15" />
   <title>Uptime Watch — Service Health Monitor</title>
   <link rel="stylesheet" href="./dashboard.css" />
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
   <script src="./dashboard.js" defer></script>
+  <script type="module" src="./yard3d.js"></script>
 </head>
+
 <body>
   <header class="site-header">
     <div class="header-inner">
@@ -22,8 +32,8 @@
       <div class="header-actions">
         <span id="healthBadge" class="health-badge">Loading</span>
         <button id="refreshBtn" class="button">↻ Refresh</button>
-        <a class="button" href="https://github.com/emptyprocess/uptime-watch"
-           target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a class="button" href="https://github.com/emptyprocess/uptime-watch" target="_blank"
+          rel="noopener noreferrer">GitHub ↗</a>
       </div>
     </div>
   </header>
@@ -56,16 +66,13 @@
           <span class="muted">Latest checks</span>
         </div>
 
-        <div class="yard" id="yard">
-          <div class="yard-floor"></div>
-          <div class="yard-building">UPTIME WATCH <span>MONITORING HUB</span></div>
-          <div id="containerYard" class="container-yard"></div>
-          <div class="truck" aria-hidden="true">
-            <div class="truck-container">⌁</div>
-            <div class="truck-cab"></div>
-            <div class="truck-wheel wheel-one"></div>
-            <div class="truck-wheel wheel-two"></div>
+        <div class="yard yard-3d" id="yard">
+          <div id="yardCanvas" class="yard-canvas"></div>
+          <div class="yard-overlay">
+            <span class="yard-live">● MONITORING TERMINAL</span>
+            <span class="yard-hint">Drag to rotate · Scroll to zoom · Click a container</span>
           </div>
+          <div id="yardTooltip" class="yard-tooltip" hidden></div>
         </div>
 
         <div class="legend">
@@ -89,7 +96,9 @@
             <h2>Monitoring coverage</h2>
           </div>
           <div id="coverageText" class="coverage-text">Loading…</div>
-          <div class="coverage-track"><div id="coverageFill"></div></div>
+          <div class="coverage-track">
+            <div id="coverageFill"></div>
+          </div>
           <p class="muted small">Based on recorded checks, not official provider status.</p>
         </div>
       </div>
@@ -122,7 +131,9 @@
     </section>
 
     <section class="panel incidents-panel" id="incidents">
-      <div class="panel-heading"><h2>Recent failed checks</h2></div>
+      <div class="panel-heading">
+        <h2>Recent failed checks</h2>
+      </div>
       <div id="incidentList" class="incident-list"></div>
     </section>
 
@@ -133,4 +144,5 @@
     </footer>
   </main>
 </body>
+
 </html>
