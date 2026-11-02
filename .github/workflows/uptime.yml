@@ -1,0 +1,39 @@
+
+name: Uptime Watch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uptime-watch
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Configure Git author
+        run: |
+          git config user.name "emptyprocess"
+          git config user.email "320864519+emptyprocess@users.noreply.github.com"
+
+      - name: Check services
+        run: python3 monitor.py
+
+      - name: Commit and push monitoring report
+        run: |
+          git add data/
+          git commit -m "monitor: uptime check $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git push origin HEAD:${{ github.event.repository.default_branch }}
