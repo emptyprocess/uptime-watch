@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1018">
+  <meta name="description" content="Public service uptime and latency monitoring">
+  <title>Uptime Watch — Service Health Monitor</title>
+  <link rel="stylesheet" href="./dashboard.css">
+  <script src="./dashboard.js" defer></script>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">◉</div>
+        <div>
+          <h1>Uptime Watch</h1>
+          <p>Independent public endpoint monitoring</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <span id="overall-status" class="status-badge">Loading</span>
+        <button id="refresh" class="button">↻ Refresh</button>
+      </div>
+    </header>
+
+    <section class="intro">
+      <div class="eyebrow">GLOBAL SERVICE HEALTH</div>
+      <h2>Know what's reachable.</h2>
+      <p>
+        Tracking major developer, cloud, AI, and internet services
+        from GitHub-hosted monitoring runners.
+      </p>
+      <div class="updated" id="last-check">Loading monitoring data…</div>
+    </section>
+
+    <section class="stats">
+      <article class="stat">
+        <span>Monitored services</span>
+        <strong id="total">—</strong>
+      </article>
+      <article class="stat">
+        <span>Operational</span>
+        <strong id="operational">—</strong>
+      </article>
+      <article class="stat">
+        <span>Unreachable</span>
+        <strong id="unreachable">—</strong>
+      </article>
+      <article class="stat">
+        <span>Average response</span>
+        <strong id="avg-latency">—</strong>
+      </article>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-wrap">
+        <input
+          id="search"
+          type="search"
+          placeholder="Search services…"
+          aria-label="Search services"
+        >
+      </div>
+      <div class="periods" role="group" aria-label="History period">
+        <button data-period="1">24h</button>
+        <button data-period="7" class="active">7d</button>
+        <button data-period="30">30d</button>
+      </div>
+    </section>
+
+    <div class="legend">
+      <span><i class="dot up"></i> Reachable</span>
+      <span><i class="dot down"></i> Failed</span>
+      <span><i class="dot unknown"></i> Inconclusive</span>
+      <span><i class="dot missing"></i> No data</span>
+    </div>
+
+    <section id="services" aria-live="polite"></section>
+
+    <section class="incidents-section">
+      <div class="section-heading">
+        <h2>Recent probe failures</h2>
+        <p>Failures observed by the monitoring runner</p>
+      </div>
+      <div id="incidents" class="incidents"></div>
+    </section>
+
+    <footer>
+      <p>
+        Endpoint reachability does not represent the complete
+        operational status of a provider.
+      </p>
+      <p>
+        Checks run on a best-effort GitHub Actions schedule.
+        Missed checks are shown as missing data.
+      </p>
+      <a href="https://github.com/emptyprocess/uptime-watch">
+        View source on GitHub
+      </a>
+    </footer>
+  </main>
+
+  <div id="tooltip" class="tooltip" role="status" hidden></div>
+</body>
+</html>

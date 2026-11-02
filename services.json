@@ -1,0 +1,62 @@
+
+{
+  "services": [
+    {"id":"github","name":"GitHub","category":"Developer Platforms","url":"https://github.com"},
+    {"id":"gitlab","name":"GitLab","category":"Developer Platforms","url":"https://gitlab.com"},
+    {"id":"bitbucket","name":"Bitbucket","category":"Developer Platforms","url":"https://bitbucket.org"},
+    {"id":"npm","name":"npm Registry","category":"Developer Platforms","url":"https://registry.npmjs.org"},
+    {"id":"pypi","name":"PyPI","category":"Developer Platforms","url":"https://pypi.org"},
+    {"id":"docker","name":"Docker Hub","category":"Developer Platforms","url":"https://hub.docker.com"},
+    {"id":"stackoverflow","name":"Stack Overflow","category":"Developer Platforms","url":"https://stackoverflow.com"},
+    {"id":"codeberg","name":"Codeberg","category":"Developer Platforms","url":"https://codeberg.org"},
+
+    {"id":"aws","name":"AWS","category":"Cloud & Hosting","url":"https://aws.amazon.com"},
+    {"id":"azure","name":"Microsoft Azure","category":"Cloud & Hosting","url":"https://azure.microsoft.com"},
+    {"id":"gcp","name":"Google Cloud","category":"Cloud & Hosting","url":"https://cloud.google.com"},
+    {"id":"cloudflare","name":"Cloudflare","category":"Cloud & Hosting","url":"https://www.cloudflare.com"},
+    {"id":"vercel","name":"Vercel","category":"Cloud & Hosting","url":"https://vercel.com"},
+    {"id":"netlify","name":"Netlify","category":"Cloud & Hosting","url":"https://www.netlify.com"},
+    {"id":"digitalocean","name":"DigitalOcean","category":"Cloud & Hosting","url":"https://www.digitalocean.com"},
+    {"id":"render","name":"Render","category":"Cloud & Hosting","url":"https://render.com"},
+    {"id":"fly","name":"Fly.io","category":"Cloud & Hosting","url":"https://fly.io"},
+
+    {"id":"openai","name":"OpenAI","category":"AI Platforms","url":"https://openai.com"},
+    {"id":"anthropic","name":"Anthropic","category":"AI Platforms","url":"https://www.anthropic.com"},
+    {"id":"gemini","name":"Google Gemini","category":"AI Platforms","url":"https://gemini.google.com"},
+    {"id":"huggingface","name":"Hugging Face","category":"AI Platforms","url":"https://huggingface.co"},
+    {"id":"groq","name":"Groq","category":"AI Platforms","url":"https://groq.com"},
+    {"id":"perplexity","name":"Perplexity","category":"AI Platforms","url":"https://www.perplexity.ai"},
+    {"id":"cohere","name":"Cohere","category":"AI Platforms","url":"https://cohere.com"},
+
+    {"id":"supabase","name":"Supabase","category":"Databases","url":"https://supabase.com"},
+    {"id":"neon","name":"Neon","category":"Databases","url":"https://neon.tech"},
+    {"id":"mongodb","name":"MongoDB Atlas","category":"Databases","url":"https://www.mongodb.com/atlas"},
+    {"id":"planetscale","name":"PlanetScale","category":"Databases","url":"https://planetscale.com"},
+    {"id":"firebase","name":"Firebase","category":"Databases","url":"https://firebase.google.com"},
+    {"id":"upstash","name":"Upstash","category":"Databases","url":"https://upstash.com"},
+
+    {"id":"slack","name":"Slack","category":"Communication","url":"https://slack.com"},
+    {"id":"discord","name":"Discord","category":"Communication","url":"https://discord.com"},
+    {"id":"zoom","name":"Zoom","category":"Communication","url":"https://zoom.us"},
+    {"id":"teams","name":"Microsoft Teams","category":"Communication","url":"https://www.microsoft.com/en-us/microsoft-teams/group-chat-software"},
+    {"id":"telegram","name":"Telegram","category":"Communication","url":"https://telegram.org"},
+
+    {"id":"stripe","name":"Stripe","category":"Payments","url":"https://stripe.com"},
+    {"id":"paypal","name":"PayPal","category":"Payments","url":"https://www.paypal.com"},
+    {"id":"razorpay","name":"Razorpay","category":"Payments","url":"https://razorpay.com"},
+
+    {"id":"notion","name":"Notion","category":"Productivity","url":"https://www.notion.so"},
+    {"id":"figma","name":"Figma","category":"Productivity","url":"https://www.figma.com"},
+    {"id":"linear","name":"Linear","category":"Productivity","url":"https://linear.app"},
+    {"id":"atlassian","name":"Atlassian","category":"Productivity","url":"https://www.atlassian.com"},
+    {"id":"trello","name":"Trello","category":"Productivity","url":"https://trello.com"},
+    {"id":"canva","name":"Canva","category":"Productivity","url":"https://www.canva.com"},
+
+    {"id":"google","name":"Google Search","category":"Internet Services","url":"https://www.google.com"},
+    {"id":"bing","name":"Bing","category":"Internet Services","url":"https://www.bing.com"},
+    {"id":"wikipedia","name":"Wikipedia","category":"Internet Services","url":"https://www.wikipedia.org"},
+    {"id":"reddit","name":"Reddit","category":"Internet Services","url":"https://www.reddit.com"},
+    {"id":"youtube","name":"YouTube","category":"Internet Services","url":"https://www.youtube.com"},
+    {"id":"duckduckgo","name":"DuckDuckGo","category":"Internet Services","url":"https://duckduckgo.com"}
+  ]
+}

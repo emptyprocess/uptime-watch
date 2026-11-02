@@ -8,9 +8,11 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
-  group: uptime-watch
+  group: uptime-watch-main
   cancel-in-progress: false
 
 jobs:
@@ -18,22 +20,45 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
-      - name: Configure Git author
+      - name: Configure Git identity
         run: |
           git config user.name "emptyprocess"
           git config user.email "320864519+emptyprocess@users.noreply.github.com"
 
-      - name: Check services
+      - name: Monitor services and generate data
         run: python3 monitor.py
 
-      - name: Commit and push monitoring report
+      - name: Commit monitoring report
+        shell: bash
         run: |
-          git add data/
-          git commit -m "monitor: uptime check $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          set -euo pipefail
+
+          git add data/ dashboard-data.json
+          git commit -m "monitor: service health $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push origin HEAD:${{ github.event.repository.default_branch }}
+
+      - name: Prepare dashboard
+        run: |
+          mkdir -p public
+          cp index.html dashboard.css dashboard.js dashboard-data.json public/
+          touch public/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload dashboard
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy dashboard
+        id: deployment
+        uses: actions/deploy-pages@v4

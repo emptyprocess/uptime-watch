@@ -1,0 +1,396 @@
+
+:root {
+  color-scheme: dark;
+  --bg: #0b1018;
+  --surface: #121a25;
+  --surface-2: #192330;
+  --border: #273342;
+  --text: #eaf0f7;
+  --muted: #91a0b1;
+  --green: #2dc78d;
+  --red: #f16c73;
+  --yellow: #e4b45d;
+  --missing: #354252;
+  --accent: #8bb5ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 28px 24px 60px;
+}
+
+.header,
+.header-right,
+.brand,
+.toolbar,
+.section-heading,
+.service-top,
+.service-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  justify-content: flex-start;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  border: 1px solid #285845;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  background: #10271f;
+  font-size: 29px;
+}
+
+h1, h2, h3, p {
+  margin-top: 0;
+}
+
+.brand h1 {
+  font-size: 19px;
+  margin-bottom: 0;
+}
+
+.brand p,
+.intro p,
+.section-heading p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 0;
+}
+
+.button,
+.periods button {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 9px 14px;
+  border-radius: 9px;
+}
+
+.button:hover,
+.periods button:hover {
+  background: var(--surface-2);
+}
+
+.status-badge {
+  background: var(--surface-2);
+  color: var(--muted);
+  padding: 8px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.healthy {
+  color: var(--green);
+  background: #102a22;
+}
+
+.status-badge.problem {
+  color: var(--red);
+  background: #321a22;
+}
+
+.intro {
+  padding: 65px 0 34px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.intro h2 {
+  font-size: clamp(30px, 5vw, 48px);
+  letter-spacing: -1.7px;
+  margin-bottom: 10px;
+}
+
+.intro p {
+  font-size: 15px;
+  max-width: 650px;
+}
+
+.updated {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 20px;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 28px;
+  margin-top: 8px;
+  letter-spacing: -1px;
+}
+
+.toolbar {
+  margin: 35px 0 20px;
+}
+
+.search-wrap {
+  flex: 1;
+  max-width: 380px;
+}
+
+#search {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 9px;
+  padding: 11px 14px;
+  outline: none;
+}
+
+#search:focus {
+  border-color: var(--accent);
+}
+
+.periods {
+  display: flex;
+  gap: 6px;
+}
+
+.periods button.active {
+  background: #223c5d;
+  border-color: #416a9c;
+  color: #c5dcff;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 22px;
+}
+
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.up { background: var(--green); }
+.down { background: var(--red); }
+.unknown { background: var(--yellow); }
+.missing { background: var(--missing); }
+
+.category {
+  margin-bottom: 25px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.category-title {
+  padding: 17px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-title h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.category-title span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.service {
+  padding: 17px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.service:last-child {
+  border-bottom: 0;
+}
+
+.service-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.service-name a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.service-name a:hover {
+  color: var(--accent);
+}
+
+.service-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.service-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.history {
+  display: flex;
+  gap: 3px;
+  margin: 13px 0 8px;
+  height: 29px;
+}
+
+.history-bar {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  border-radius: 3px;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.history-bar:hover,
+.history-bar:focus-visible {
+  opacity: 0.8;
+  transform: scaleY(1.12);
+  outline: 1px solid white;
+}
+
+.service-bottom {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.incidents-section {
+  margin-top: 42px;
+}
+
+.section-heading h2 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.incidents {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.incident {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.incident strong {
+  font-size: 13px;
+}
+
+.incident p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 5px 0 0;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  max-width: min(340px, calc(100vw - 30px));
+  background: #202d3b;
+  border: 1px solid #4a5d72;
+  color: white;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  box-shadow: 0 15px 35px #0008;
+  white-space: pre-line;
+}
+
+.tooltip[hidden] {
+  display: none;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 55px;
+  padding-top: 25px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+footer a {
+  color: var(--accent);
+}
+
+@media (max-width: 720px) {
+  .container { padding: 18px 14px 40px; }
+  .header { align-items: flex-start; }
+  .header-right { flex-direction: column; align-items: flex-end; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .search-wrap { max-width: none; }
+  .intro { padding-top: 42px; }
+  .history { gap: 2px; }
+  .category-title, .service { padding-left: 13px; padding-right: 13px; }
+}
