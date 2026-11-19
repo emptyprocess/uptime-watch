@@ -1,0 +1,507 @@
+{
+  "timestamp": "2026-11-19T04:34:10.107036+00:00",
+  "run_id": "44459197080",
+  "attempt": "1",
+  "results": [
+    {
+      "id": "github",
+      "name": "GitHub",
+      "category": "Developer Platforms",
+      "url": "https://github.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 175.75,
+      "error": null
+    },
+    {
+      "id": "gitlab",
+      "name": "GitLab",
+      "category": "Developer Platforms",
+      "url": "https://gitlab.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 298.88,
+      "error": null
+    },
+    {
+      "id": "bitbucket",
+      "name": "Bitbucket",
+      "category": "Developer Platforms",
+      "url": "https://bitbucket.org",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 403.35,
+      "error": null
+    },
+    {
+      "id": "npm",
+      "name": "npm Registry",
+      "category": "Developer Platforms",
+      "url": "https://registry.npmjs.org",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 77.92,
+      "error": null
+    },
+    {
+      "id": "pypi",
+      "name": "PyPI",
+      "category": "Developer Platforms",
+      "url": "https://pypi.org",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 58.27,
+      "error": null
+    },
+    {
+      "id": "docker",
+      "name": "Docker Hub",
+      "category": "Developer Platforms",
+      "url": "https://hub.docker.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 174.0,
+      "error": null
+    },
+    {
+      "id": "stackoverflow",
+      "name": "Stack Overflow",
+      "category": "Developer Platforms",
+      "url": "https://stackoverflow.com",
+      "status": "unknown",
+      "http_status": 403,
+      "latency_ms": 223.06,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "codeberg",
+      "name": "Codeberg",
+      "category": "Developer Platforms",
+      "url": "https://codeberg.org",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 482.55,
+      "error": null
+    },
+    {
+      "id": "aws",
+      "name": "AWS",
+      "category": "Cloud & Hosting",
+      "url": "https://aws.amazon.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 208.15,
+      "error": null
+    },
+    {
+      "id": "azure",
+      "name": "Microsoft Azure",
+      "category": "Cloud & Hosting",
+      "url": "https://azure.microsoft.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 718.13,
+      "error": null
+    },
+    {
+      "id": "gcp",
+      "name": "Google Cloud",
+      "category": "Cloud & Hosting",
+      "url": "https://cloud.google.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 268.47,
+      "error": null
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "category": "Cloud & Hosting",
+      "url": "https://www.cloudflare.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 191.96,
+      "error": null
+    },
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "category": "Cloud & Hosting",
+      "url": "https://vercel.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 167.2,
+      "error": null
+    },
+    {
+      "id": "netlify",
+      "name": "Netlify",
+      "category": "Cloud & Hosting",
+      "url": "https://www.netlify.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 278.29,
+      "error": null
+    },
+    {
+      "id": "digitalocean",
+      "name": "DigitalOcean",
+      "category": "Cloud & Hosting",
+      "url": "https://www.digitalocean.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 83.45,
+      "error": null
+    },
+    {
+      "id": "render",
+      "name": "Render",
+      "category": "Cloud & Hosting",
+      "url": "https://render.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 150.44,
+      "error": null
+    },
+    {
+      "id": "fly",
+      "name": "Fly.io",
+      "category": "Cloud & Hosting",
+      "url": "https://fly.io",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 195.49,
+      "error": null
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "category": "AI Platforms",
+      "url": "https://openai.com",
+      "status": "unknown",
+      "http_status": 403,
+      "latency_ms": 53.24,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "category": "AI Platforms",
+      "url": "https://www.anthropic.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 86.57,
+      "error": null
+    },
+    {
+      "id": "gemini",
+      "name": "Google Gemini",
+      "category": "AI Platforms",
+      "url": "https://gemini.google.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 165.67,
+      "error": null
+    },
+    {
+      "id": "huggingface",
+      "name": "Hugging Face",
+      "category": "AI Platforms",
+      "url": "https://huggingface.co",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 53.0,
+      "error": null
+    },
+    {
+      "id": "groq",
+      "name": "Groq",
+      "category": "AI Platforms",
+      "url": "https://groq.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 168.66,
+      "error": null
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity",
+      "category": "AI Platforms",
+      "url": "https://www.perplexity.ai",
+      "status": "unknown",
+      "http_status": 403,
+      "latency_ms": 90.03,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "cohere",
+      "name": "Cohere",
+      "category": "AI Platforms",
+      "url": "https://cohere.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 288.41,
+      "error": null
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase",
+      "category": "Databases",
+      "url": "https://supabase.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 113.21,
+      "error": null
+    },
+    {
+      "id": "neon",
+      "name": "Neon",
+      "category": "Databases",
+      "url": "https://neon.tech",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 270.53,
+      "error": null
+    },
+    {
+      "id": "mongodb",
+      "name": "MongoDB Atlas",
+      "category": "Databases",
+      "url": "https://www.mongodb.com/atlas",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 1010.46,
+      "error": null
+    },
+    {
+      "id": "planetscale",
+      "name": "PlanetScale",
+      "category": "Databases",
+      "url": "https://planetscale.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 185.22,
+      "error": null
+    },
+    {
+      "id": "firebase",
+      "name": "Firebase",
+      "category": "Databases",
+      "url": "https://firebase.google.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 295.19,
+      "error": null
+    },
+    {
+      "id": "upstash",
+      "name": "Upstash",
+      "category": "Databases",
+      "url": "https://upstash.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 170.22,
+      "error": null
+    },
+    {
+      "id": "slack",
+      "name": "Slack",
+      "category": "Communication",
+      "url": "https://slack.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 250.51,
+      "error": null
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "category": "Communication",
+      "url": "https://discord.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 110.5,
+      "error": null
+    },
+    {
+      "id": "zoom",
+      "name": "Zoom",
+      "category": "Communication",
+      "url": "https://zoom.us",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 146.26,
+      "error": null
+    },
+    {
+      "id": "teams",
+      "name": "Microsoft Teams",
+      "category": "Communication",
+      "url": "https://www.microsoft.com/en-us/microsoft-teams/group-chat-software",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 445.84,
+      "error": null
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram",
+      "category": "Communication",
+      "url": "https://telegram.org",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 485.16,
+      "error": null
+    },
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "category": "Payments",
+      "url": "https://stripe.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 184.39,
+      "error": null
+    },
+    {
+      "id": "paypal",
+      "name": "PayPal",
+      "category": "Payments",
+      "url": "https://www.paypal.com",
+      "status": "unknown",
+      "http_status": 403,
+      "latency_ms": 224.27,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "razorpay",
+      "name": "Razorpay",
+      "category": "Payments",
+      "url": "https://razorpay.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 1162.44,
+      "error": null
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "category": "Productivity",
+      "url": "https://www.notion.so",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 220.0,
+      "error": null
+    },
+    {
+      "id": "figma",
+      "name": "Figma",
+      "category": "Productivity",
+      "url": "https://www.figma.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 166.01,
+      "error": null
+    },
+    {
+      "id": "linear",
+      "name": "Linear",
+      "category": "Productivity",
+      "url": "https://linear.app",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 293.54,
+      "error": null
+    },
+    {
+      "id": "atlassian",
+      "name": "Atlassian",
+      "category": "Productivity",
+      "url": "https://www.atlassian.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 597.96,
+      "error": null
+    },
+    {
+      "id": "trello",
+      "name": "Trello",
+      "category": "Productivity",
+      "url": "https://trello.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 342.41,
+      "error": null
+    },
+    {
+      "id": "canva",
+      "name": "Canva",
+      "category": "Productivity",
+      "url": "https://www.canva.com",
+      "status": "unknown",
+      "http_status": 403,
+      "latency_ms": 97.77,
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "id": "google",
+      "name": "Google Search",
+      "category": "Internet Services",
+      "url": "https://www.google.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 67.51,
+      "error": null
+    },
+    {
+      "id": "bing",
+      "name": "Bing",
+      "category": "Internet Services",
+      "url": "https://www.bing.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 112.38,
+      "error": null
+    },
+    {
+      "id": "wikipedia",
+      "name": "Wikipedia",
+      "category": "Internet Services",
+      "url": "https://www.wikipedia.org",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 113.71,
+      "error": null
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "category": "Internet Services",
+      "url": "https://www.reddit.com",
+      "status": "unknown",
+      "http_status": 403,
+      "latency_ms": 43.7,
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "category": "Internet Services",
+      "url": "https://www.youtube.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 175.77,
+      "error": null
+    },
+    {
+      "id": "duckduckgo",
+      "name": "DuckDuckGo",
+      "category": "Internet Services",
+      "url": "https://duckduckgo.com",
+      "status": "up",
+      "http_status": 200,
+      "latency_ms": 182.52,
+      "error": null
+    }
+  ]
+}
